@@ -17,6 +17,11 @@ fun Routing.route(path: String = "", block: Route.() -> Route) = Route(
     routes.add(this)
 }
 
+fun Route.route(path: String = "", block: Route.() -> Route) = Route(
+    application,
+    this.trimEnd('/').plus('/').plus(path.trimStart('/'))
+)
+
 fun Routing.get(path: String = "", block: (request: HttpRequest) -> HttpResponse) = Route(
         application,
         path,
