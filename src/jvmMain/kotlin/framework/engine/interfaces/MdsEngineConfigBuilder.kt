@@ -26,5 +26,5 @@ interface MdsEngineConfigBuilder {
     /**
      * The entry point to activate while building te server
      */
-    var entryPoint: ((engine: MdsEngine) -> Any)?
+    var entryPoint: (engine: MdsEngine) -> Unit
 }

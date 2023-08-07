@@ -10,12 +10,12 @@ import framework.engine.handlers.Routing
 
 fun Application.routing(builder: Routing.() -> Unit) = this.routing.apply(builder)
 
-fun Routing.route(path: String = "", block: Route.() -> Route) = Route(
-    application,
-    path
-).apply {
-    routes.add(this)
-}
+fun Routing.route(path: String = "", block: Route.() -> Unit) = routes.add(
+    Route(
+        application,
+        path
+    ).apply(block)
+)
 
 fun Route.route(path: String = "", block: Route.() -> Route) = Route(
     application,
@@ -64,32 +64,26 @@ fun Route.get(path: String = "", block: (request: HttpRequest) -> HttpResponse) 
     )
 }
 
-fun Route.post(path: String = "", block: (request: HttpRequest) -> HttpResponse) = this.apply {
-    this.requestHandler.add(
+fun Route.post(path: String = "", block: (request: HttpRequest) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
             block
         )
     )
-}
 
-fun Route.put(path: String = "", block: (request: HttpRequest) -> HttpResponse) = this.apply {
-    this.requestHandler.add(
+fun Route.put(path: String = "", block: (request: HttpRequest) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
             block
         )
     )
-}
 
-fun Route.patch(path: String = "", block: (request: HttpRequest) -> HttpResponse) = this.apply {
-    this.requestHandler.add(
+fun Route.patch(path: String = "", block: (request: HttpRequest) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
             block
         )
     )
-}

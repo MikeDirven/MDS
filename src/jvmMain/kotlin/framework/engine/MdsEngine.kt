@@ -20,7 +20,7 @@ class MdsEngine(
     override var host: String = "localhost"
     override var maxPools: Int = 2
     override var maxPoolThreads: Int = 4
-    override var entryPoint: (MdsEngine.() -> Any)? = null
+    override lateinit var entryPoint: (engine: MdsEngine) -> Unit
     override lateinit var threadPools: List<ThreadPoolExecutor>
 
     private var server: ServerSocket
@@ -38,7 +38,7 @@ class MdsEngine(
         createThreadPoolList()
 
         // Execute entry point
-        entryPoint?.let { it() }
+        entryPoint(this)
 
         // Get system environment overrides
         System.getenv().apply {
@@ -67,7 +67,7 @@ class MdsEngine(
         shutDown()
     }
 
-    fun shutDown(){
+    private fun shutDown(){
         //Shutting down hook
         applicationHooks.filter { it.hook == Hook.SHUTDOWN }.forEach {
             it.function(this, null)

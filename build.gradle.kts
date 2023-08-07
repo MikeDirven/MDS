@@ -1,27 +1,65 @@
 plugins {
-    kotlin("jvm") version "1.8.21"
+    kotlin("multiplatform") version "1.9.0"
+    id("maven-publish")
     application
 }
 
+val user: String = System.getenv("GITHUB_USER")
+val key: String = System.getenv("GITHUB_KEY")
 group = "nl.md-systems"
-version = "0.0.0.1"
+version = "0.0.0.2"
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation(kotlin("test"))
+publishing{
+    repositories {
+        maven {
+            name = "GitHub"
+            url = uri("https://maven.pkg.github.com/MikeDirven/MDS") // Github Package
+            credentials {
+                //Fetch these details from the properties file or from Environment variables
+                username = user
+                password = key
+            }
+        }
+    }
 }
+
+//dependencies {
+//    testImplementation(kotlin("test"))
+//    implementation("com.google.code.gson:gson:2.8.9")
+//}
 
 tasks.test {
     useJUnitPlatform()
 }
 
 kotlin {
-    jvmToolchain(15)
+    jvm() {
+        compilations.all {
+            kotlinOptions.jvmTarget = "17"
+        }
+        withJava()
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+    }
+    sourceSets {
+        val jvmMain by getting {
+            dependencies {
+                implementation("com.google.code.gson:gson:2.8.9")
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+            }
+        }
+    }
 }
 
-application {
-    mainClass.set("MainKt")
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
 }

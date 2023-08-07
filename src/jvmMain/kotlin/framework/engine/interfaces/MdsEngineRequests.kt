@@ -3,25 +3,32 @@ package framework.engine.interfaces
 import java.io.BufferedReader
 
 interface MdsEngineRequests {
-    fun readRequestBody(reader: BufferedReader): String {
-        val contentLengthHeader = "Content-Length: "
-        var contentLength = 0
-        var line: String?
-
-        while (true) {
-            line = reader.readLine()
-            if (line == null || line.isEmpty())
-                break
-
-            if (line.startsWith(contentLengthHeader)) {
-                contentLength = line.substring(contentLengthHeader.length).toInt()
-            }
-        }
+    fun readRequestBody(reader: BufferedReader, contentLength: Int): String {
 
         val requestBody = CharArray(contentLength)
         reader.read(requestBody, 0, contentLength)
 
         return String(requestBody)
+    }
+
+    fun readRequestHeaders(reader: BufferedReader): Map<String, String> {
+        val requestHeaders: MutableMap<String, String> = mutableMapOf()
+        var line: String?
+
+        while (true){
+            line = reader.readLine()
+            if (line == null || line.isEmpty())
+                break
+
+            val headerParts = line.split(":", limit = 2)
+            if (headerParts.size == 2) {
+                val headerName = headerParts[0].trim()
+                val headerValue = headerParts[1].trim()
+                requestHeaders[headerName] = headerValue
+            }
+        }
+
+        return requestHeaders
     }
 
     fun String.readQueryParameters(): Map<String, String> =  mutableMapOf<String, String>().also { map ->

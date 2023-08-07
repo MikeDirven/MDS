@@ -6,16 +6,19 @@ import framework.engine.classes.HttpResponse
 import framework.engine.enums.Hook
 import framework.engine.enums.RequestMethods
 import framework.engine.interfaces.MdsEngineHooks
+import framework.engine.interfaces.MdsEnginePlugins
 import framework.engine.interfaces.MdsEngineRequests
 import framework.engine.logging.Tags
+import framework.engine.plugins.PluginKey
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.Socket
 
-open class Application() : Thread("Mds_Engine_Thread"),  MdsEngineRequests, MdsEngineHooks {
+open class Application() : Thread("Mds_Engine_Thread"),  MdsEngineRequests, MdsEngineHooks, MdsEnginePlugins {
     override val applicationHooks: MutableList<ApplicationHook> = mutableListOf()
+    override val applicationPlugins: MutableMap<PluginKey<*>, Any> = mutableMapOf()
     val routing: Routing = Routing(this)
 
     internal fun handleIncomingPipeline(clientSocket: Socket) {
@@ -24,10 +27,11 @@ open class Application() : Thread("Mds_Engine_Thread"),  MdsEngineRequests, MdsE
         val reader = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
         val request: HttpRequest = reader.readLine().split(" ").let { requestLine ->
             HttpRequest(
-                RequestMethods.valueOf(requestLine[0]),
-                requestLine[1].substringBefore("?"),
-                requestLine[1].substringAfterLast("?", "").readQueryParameters(),
-                requestLine[2])
+                this,
+                method = RequestMethods.valueOf(requestLine[0]),
+                path = requestLine[1].substringBefore("?"),
+                queryParams = requestLine[1].substringAfterLast("?", "").readQueryParameters(),
+                protocol = requestLine[2])
         }
 
         println("${Tags.methodColor(request.method)} ${request.method} - ${request.path} - ${request.queryParams}")
@@ -37,6 +41,9 @@ open class Application() : Thread("Mds_Engine_Thread"),  MdsEngineRequests, MdsE
             it.function(this, request)
         }
 
+        // Receive Headers
+        request.headers = readRequestHeaders(reader)
+
         if(request.method != RequestMethods.GET){
             // Before body receive hook
             applicationHooks.filter { it.hook == Hook.BEFORE_BODY_READ }.forEach {
@@ -44,7 +51,7 @@ open class Application() : Thread("Mds_Engine_Thread"),  MdsEngineRequests, MdsE
             }
 
             // Receive body
-            request.body = readRequestBody(reader)
+            request.body = readRequestBody(reader, request.headers["Content-Length"]?.toInt() ?: 0)
 
             // After body received hook
             applicationHooks.filter { it.hook == Hook.BODY_RECEIVED }.forEach {
