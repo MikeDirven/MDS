@@ -1,6 +1,6 @@
 package framework.engine.interfaces
 
-import framework.engine.factorys.RequestThreadFactory
+import framework.engine.factories.RequestThreadFactory
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -15,7 +15,7 @@ interface MdsEngineThreading {
         60L, TimeUnit.SECONDS,
         LinkedBlockingQueue(Int.MAX_VALUE),
         RequestThreadFactory("Mds_Engine_Pool"),
-        ThreadPoolExecutor.DiscardOldestPolicy()
+        ThreadPoolExecutor.DiscardPolicy()
     )
 
     fun createThreadPoolList(){

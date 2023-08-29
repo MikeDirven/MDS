@@ -1,4 +1,4 @@
-package framework.engine.factorys
+package framework.engine.factories
 
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger

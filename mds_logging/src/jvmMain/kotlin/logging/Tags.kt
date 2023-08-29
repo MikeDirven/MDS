@@ -1,4 +1,4 @@
-package framework.engine.logging
+package logging
 
 import framework.engine.enums.RequestMethods
 

@@ -5,9 +5,11 @@ import framework.engine.MdsEngine
 import framework.engine.classes.ContentType
 import framework.engine.enums.HttpStatusCode
 import framework.engine.interfaces.install
-import framework.engine.serialization.gson.GsonSerializer
-import framework.engine.serialization.gson.receive
-import framework.engine.serialization.gson.respond
+import framework.engine.logging.LoggingPlugin
+import framework.engine.serialization.ContentNegotiation
+import framework.engine.serialization.extensions.receive
+import framework.engine.serialization.extensions.respond
+import framework.engine.serialization.gson.extensions.gson
 
 fun main(args: Array<String>) = MdsEngine {
     port = 1500
@@ -22,25 +24,23 @@ data class Test(
 
 fun application(engine: MdsEngine) {
     engine.apply {
-        install(GsonSerializer){
-            contentType = ContentType.Application.json
+        install(LoggingPlugin)
+        install(ContentNegotiation){
+            gson {
+                this.setPrettyPrinting()
+            }
         }
 
         routing {
             post("esmee") { call ->
                 val test = call.receive<Test>()
-                println(test.test)
-                println(test.number)
+                println(test)
 
-                call.respond(
-                    HttpStatusCode.OK,
-                    ContentType.Application.json,
-                    Test("mike", 29)
-                )
+                call.respond(test)
             }
 
             get("esmee") { call ->
-                call.respond(HttpStatusCode.OK, ContentType.Application.json,
+                call.respond(HttpStatusCode.OK, ContentType.Application.JSON,
                     "{\"esmee\": {" +
                             "\"name\": \"esmee\"" +
                             "}" +
@@ -49,3 +49,36 @@ fun application(engine: MdsEngine) {
         }
     }
 }
+
+
+val gsonString = """
+    {
+      "active" : 1716359544,
+      "activity" : "#bookworm",
+      "activitySourceDocuments" : "man.cgi",
+      "activityStatus" : "invalid",
+      "activityStep" : "0x6441d37b4b96471da699d389b00eba9535bd14c7a47a40398dc91f257ba41462",
+      "activityStepStatus" : "failed",
+      "activityType" : "rejected",
+      "activityTypeDescription" : "Beyond our ken",
+      "activityUsers" : "Lawrence",
+      "articles" : 9700,
+      "assigned" : "Bugger@aol.bz",
+      "current" : "+664047621036",
+      "end" : "car.z",
+      "externalReference" : "jpeg",
+      "linkedActivity" : "https://MindlessBobcat.ru/education/moment/job/hour",
+      "location" : "Denmark, Pristina, Upper East Biacunk, Grove Lane 16",
+      "locationsAmount" : 16,
+      "orders" : 5411,
+      "recordId" : 1995923155,
+      "requestedTime" : "11:19:10.000",
+      "selectionTime" : "01:57:10.000",
+      "started" : "61",
+      "status" : 672178617,
+      "statusDescription" : "Beat around the bush",
+      "type" : "failed",
+      "typeDescription" : "A rolling stone gathers no moss",
+      "workplace" : "Malawi, Kingdom, Drussatnend Circle, Willow Court 2"
+    }
+""".trimIndent()

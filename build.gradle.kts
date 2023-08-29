@@ -49,7 +49,9 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
+                implementation("ch.qos.logback:logback-classic:1.4.11")
                 implementation("com.google.code.gson:gson:2.8.9")
+                implementation(kotlin("reflect"))
             }
         }
         val jvmTest by getting {

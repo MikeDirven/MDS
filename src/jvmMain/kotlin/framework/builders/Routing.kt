@@ -19,7 +19,7 @@ fun Routing.route(path: String = "", block: Route.() -> Unit) = routes.add(
 
 fun Route.route(path: String = "", block: Route.() -> Route) = Route(
     application,
-    this.trimEnd('/').plus('/').plus(path.trimStart('/'))
+    this.path.trimEnd('/').plus('/').plus(path.trimStart('/'))
 )
 
 fun Routing.get(path: String = "", block: (request: HttpRequest) -> HttpResponse) = Route(

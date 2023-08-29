@@ -1,4 +1,4 @@
-package framework.engine.logging
+package logging
 
 object Colors {
     val red = "\u001b[31m"
