@@ -20,7 +20,7 @@ class MdsEngine(
     override var host: String = "localhost"
     override var maxPools: Int = 2
     override var maxPoolThreads: Int = 4
-    override lateinit var entryPoint: (engine: MdsEngine) -> Unit
+    override lateinit var entryPoint: MdsEngine.() -> Unit
     override lateinit var threadPools: List<ThreadPoolExecutor>
 
     private var server: ServerSocket
@@ -38,7 +38,7 @@ class MdsEngine(
         createThreadPoolList()
 
         // Execute entry point
-        entryPoint(this)
+        this.entryPoint()
 
         // Get system environment overrides
         System.getenv().apply {

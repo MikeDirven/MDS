@@ -6,7 +6,7 @@ import framework.engine.plugins.MdsPlugin
 import framework.engine.plugins.PluginKey
 
 class LoggingPlugin(
-    val application: Application
+    private val application: Application
 ) {
     init {
         application.on(Hook.BODY_RECEIVED){ call ->

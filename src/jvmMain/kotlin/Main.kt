@@ -14,7 +14,7 @@ import framework.engine.serialization.gson.extensions.gson
 fun main(args: Array<String>) = MdsEngine {
     port = 1500
     host = "0.0.0.0"
-    entryPoint = ::application
+    entryPoint = MdsEngine::application
 }.start()
 
 data class Test(
@@ -22,8 +22,7 @@ data class Test(
     val number: Int
 )
 
-fun application(engine: MdsEngine) {
-    engine.apply {
+fun MdsEngine.application() {
         install(LoggingPlugin)
         install(ContentNegotiation){
             gson {
