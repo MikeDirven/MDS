@@ -1,6 +1,7 @@
 import mds.builders.get
 import mds.builders.post
 import mds.builders.routing
+import mds.engine.MdsEngine
 import mds.engine.classes.ContentType
 import mds.engine.enums.HttpStatusCode
 import mds.engine.interfaces.install
@@ -23,7 +24,7 @@ data class Test(
     val number: Int
 )
 
-fun mds.engine.MdsEngine.application() {
+fun MdsEngine.application() {
         install(LoggingPlugin)
         install(ContentNegotiation){
             gson {
