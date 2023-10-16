@@ -1,20 +1,21 @@
-import framework.builders.get
-import framework.builders.post
-import framework.builders.routing
-import framework.engine.MdsEngine
-import framework.engine.classes.ContentType
-import framework.engine.enums.HttpStatusCode
-import framework.engine.interfaces.install
-import framework.engine.logging.LoggingPlugin
-import framework.engine.serialization.ContentNegotiation
-import framework.engine.serialization.extensions.receive
-import framework.engine.serialization.extensions.respond
-import framework.engine.serialization.gson.extensions.gson
+import mds.builders.get
+import mds.builders.post
+import mds.builders.routing
+import mds.engine.classes.ContentType
+import mds.engine.enums.HttpStatusCode
+import mds.engine.interfaces.install
+import mds.engine.logging.LoggingPlugin
+import mds.plugins.serialization.ContentNegotiation
+import mds.plugins.serialization.ContentNegotiation.Companion.install
+import mds.plugins.serialization.extensions.receive
+import mds.plugins.serialization.extensions.respond
+import mds.plugins.serialization.gson.extensions.gson
 
-fun main(args: Array<String>) = MdsEngine {
+
+fun main(args: Array<String>) = mds.engine.MdsEngine {
     port = 1500
     host = "0.0.0.0"
-    entryPoint = MdsEngine::application
+    entryPoint = mds.engine.MdsEngine::application
 }.start()
 
 data class Test(
@@ -22,11 +23,11 @@ data class Test(
     val number: Int
 )
 
-fun MdsEngine.application() {
+fun mds.engine.MdsEngine.application() {
         install(LoggingPlugin)
         install(ContentNegotiation){
             gson {
-                this.setPrettyPrinting()
+                setPrettyPrinting()
             }
         }
 
@@ -34,12 +35,12 @@ fun MdsEngine.application() {
             post("esmee") { call ->
                 val test = call.receive<Test>()
                 println(test)
-
                 call.respond(test)
             }
 
             get("esmee") { call ->
-                call.respond(HttpStatusCode.OK, ContentType.Application.JSON,
+                call.respond(
+                    HttpStatusCode.OK, ContentType.Application.JSON,
                     "{\"esmee\": {" +
                             "\"name\": \"esmee\"" +
                             "}" +
@@ -47,7 +48,6 @@ fun MdsEngine.application() {
             }
         }
     }
-}
 
 
 val gsonString = """
