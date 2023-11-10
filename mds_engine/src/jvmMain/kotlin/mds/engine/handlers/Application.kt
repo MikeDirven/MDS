@@ -1,6 +1,7 @@
 package mds.engine.handlers
 
 import mds.engine.classes.ApplicationHook
+import mds.engine.classes.HttpCall
 import mds.engine.classes.HttpRequest
 import mds.engine.classes.HttpResponse
 import mds.engine.enums.Hook
@@ -16,7 +17,7 @@ import java.net.Socket
 import kotlin.reflect.KClass
 
 open class Application() : Thread("Mds_Engine_Thread"), MdsEngineRequests, MdsEngineHooks, MdsEnginePlugins, MdsEngineExceptions {
-    override val exceptionsToCatch: MutableMap<KClass<Exception>, ExceptionHandler> = mutableMapOf()
+    override val exceptionsToCatch: MutableMap<KClass<Throwable>, ExceptionHandler> = mutableMapOf()
     override val applicationHooks: MutableList<ApplicationHook> = mutableListOf()
     override val applicationPlugins: MutableMap<PluginKey<*>, Any> = mutableMapOf()
     val routing: Routing = Routing(this)
@@ -64,14 +65,14 @@ open class Application() : Thread("Mds_Engine_Thread"), MdsEngineRequests, MdsEn
 
             // Find Handler otherwise defaults to Not found
             val routesAvailable = routing.routes.filter { request.path.contains(it.path) }
-            val handlersAvailable = mutableListOf<(request: HttpRequest) -> HttpResponse>().apply {
+            val handlersAvailable = mutableListOf<(call: HttpCall) -> HttpResponse>().apply {
                 routesAvailable.forEach { route ->
                     this.addAll(route.requestHandler.filter { it.path.trimStart('/') == request.path.trimStart('/') && it.method == request.method }
                         .map { it.handler })
                 }
             }
 
-            val response = handlersAvailable.firstOrNull()?.let { it(request) }
+            val response = handlersAvailable.firstOrNull()?.let { it(HttpCall(this, request, HttpResponse())) }
 
             // Ready to send hook
             applicationHooks.filter { it.hook == Hook.RESPONSE_READY }.forEach {
@@ -94,7 +95,7 @@ open class Application() : Thread("Mds_Engine_Thread"), MdsEngineRequests, MdsEn
             applicationHooks.filter { it.hook == Hook.RESPONSE_SEND }.forEach {
                 it.function(this, request, response)
             }
-        } catch (e: Exception){
+        } catch (e: Throwable){
             val response = exceptionsToCatch.get(e::class)?.invoke(request, e) ?: defaultHandler.invoke(request, e)
 
             applicationHooks.filter { it.hook == Hook.RESPONSE_READY }.forEach {

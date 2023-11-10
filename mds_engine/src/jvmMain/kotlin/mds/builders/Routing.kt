@@ -1,9 +1,6 @@
 package mds.builders
 
-import mds.engine.classes.HttpRequest
-import mds.engine.classes.HttpResponse
-import mds.engine.classes.RequestHandler
-import mds.engine.classes.Route
+import mds.engine.classes.*
 import mds.engine.enums.RequestMethods
 import mds.engine.handlers.Application
 import mds.engine.handlers.Routing
@@ -22,7 +19,7 @@ fun Route.route(path: String = "", block: Route.() -> Route) = Route(
     this.path.trimEnd('/').plus('/').plus(path.trimStart('/'))
 )
 
-fun Routing.get(path: String = "", block: (request: HttpRequest) -> HttpResponse) = Route(
+fun Routing.get(path: String = "", block: (call: HttpCall) -> HttpResponse) = Route(
         application,
         path,
         mutableListOf(RequestHandler(path, RequestMethods.GET, block))
@@ -30,7 +27,7 @@ fun Routing.get(path: String = "", block: (request: HttpRequest) -> HttpResponse
         routes.add(this)
     }
 
-fun Routing.post(path: String = "", block: (request: HttpRequest) -> HttpResponse) = Route(
+fun Routing.post(path: String = "", block: (call: HttpCall) -> HttpResponse) = Route(
         application,
         path,
         mutableListOf(RequestHandler(path, RequestMethods.POST, block))
@@ -38,7 +35,7 @@ fun Routing.post(path: String = "", block: (request: HttpRequest) -> HttpRespons
         routes.add(this)
     }
 
-fun Routing.put(path: String = "", block: (request: HttpRequest) -> HttpResponse) = Route(
+fun Routing.put(path: String = "", block: (call: HttpCall) -> HttpResponse) = Route(
         application,
         path,
         mutableListOf(RequestHandler(path, RequestMethods.PUT, block))
@@ -46,7 +43,7 @@ fun Routing.put(path: String = "", block: (request: HttpRequest) -> HttpResponse
         routes.add(this)
     }
 
-fun Routing.patch(path: String = "", block: (request: HttpRequest) -> HttpResponse) = Route(
+fun Routing.patch(path: String = "", block: (call: HttpCall) -> HttpResponse) = Route(
         application,
         path,
         mutableListOf(RequestHandler(path, RequestMethods.PATCH, block))
@@ -54,7 +51,7 @@ fun Routing.patch(path: String = "", block: (request: HttpRequest) -> HttpRespon
         routes.add(this)
     }
 
-fun Route.get(path: String = "", block: (request: HttpRequest) -> HttpResponse) = this.apply {
+fun Route.get(path: String = "", block: (call: HttpCall) -> HttpResponse) = this.apply {
     this.requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
@@ -64,7 +61,7 @@ fun Route.get(path: String = "", block: (request: HttpRequest) -> HttpResponse) 
     )
 }
 
-fun Route.post(path: String = "", block: (request: HttpRequest) -> HttpResponse) = requestHandler.add(
+fun Route.post(path: String = "", block: (call: HttpCall) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
@@ -72,7 +69,7 @@ fun Route.post(path: String = "", block: (request: HttpRequest) -> HttpResponse)
         )
     )
 
-fun Route.put(path: String = "", block: (request: HttpRequest) -> HttpResponse) = requestHandler.add(
+fun Route.put(path: String = "", block: (call: HttpCall) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
@@ -80,7 +77,7 @@ fun Route.put(path: String = "", block: (request: HttpRequest) -> HttpResponse) 
         )
     )
 
-fun Route.patch(path: String = "", block: (request: HttpRequest) -> HttpResponse) = requestHandler.add(
+fun Route.patch(path: String = "", block: (call: HttpCall) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,

@@ -16,5 +16,5 @@ data class HttpRequest(
     val outPutWriter: BufferedWriter
 ) {
     fun bodyAsText() = this.body
-    fun respond(statusCode: HttpStatusCode, contentType: ContentType, response: String) = HttpResponse(statusCode, contentType, response)
+    fun respond(statusCode: HttpStatusCode, contentType: ContentType, response: String) = HttpResponse(statusCode, contentType, mutableListOf(), response)
 }

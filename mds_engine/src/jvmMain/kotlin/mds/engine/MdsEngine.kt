@@ -30,11 +30,12 @@ class MdsEngine(
     override var maxPoolThreads: Int = 4
     override lateinit var entryPoint: mds.engine.MdsEngine.() -> Unit
     override lateinit var threadPools: List<ThreadPoolExecutor>
-    override val exceptionsToCatch: MutableMap<KClass<Exception>, ExceptionHandler> = mutableMapOf(
-        Exception::class to { call, cause ->
+    override val exceptionsToCatch: MutableMap<KClass<Throwable>, ExceptionHandler> = mutableMapOf(
+        Throwable::class to { call, cause ->
             HttpResponse(
                 HttpStatusCode.INTERNAL_SERVER_ERROR,
                 ContentType.Application.JSON,
+                mutableListOf(),
                 HttpException(
                     cause::class.jvmName,
                     cause.message ?: "Unknown exception"
@@ -67,7 +68,7 @@ class MdsEngine(
         }
 
         // Configure socket
-        server = ServerSocket(port,1, InetAddress.getByName(host))
+        server = ServerSocket(port,50, InetAddress.getByName(host))
     }
 
     override fun run() {
@@ -75,7 +76,7 @@ class MdsEngine(
         applicationHooks.filter { it.hook == Hook.SERVER_STARTED }.forEach {
             it.function(this, null, null)
         }
-        println("${Tags.engine}Listening on: ${server.inetAddress}:${server.localPort}")
+        println("${Tags.engine} Listening on: ${server.inetAddress}:${server.localPort}")
 
         while (!interrupted()){
             val clientSocket = server.accept()

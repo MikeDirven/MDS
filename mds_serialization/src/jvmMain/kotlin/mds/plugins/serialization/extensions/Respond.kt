@@ -1,26 +1,40 @@
 package mds.plugins.serialization.extensions
 
-import mds.engine.classes.ContentType
-import mds.engine.classes.HttpRequest
-import mds.engine.classes.HttpResponse
+import mds.engine.classes.*
 import mds.engine.enums.HttpStatusCode
 
-fun HttpRequest.respond(body: Any) : HttpResponse {
+fun HttpCall.respond(body: Any) : HttpResponse {
     val contentType = ContentType.parse(
-        headers.get("Content-Type") ?: throw RuntimeException("No content type found")
+        request.headers.get("Content-Type") ?: throw RuntimeException("No content type found")
     )
 
-    return HttpResponse(HttpStatusCode.OK, contentType, body)
+    return response.apply {
+        status = HttpStatusCode.OK
+        headers.add(HttpHeader("content-type", contentType.actual))
+        response = body
+    }
 }
 
-fun HttpRequest.respond(statusCode: HttpStatusCode, body: Any) : HttpResponse {
+fun HttpCall.respond(statusCode: HttpStatusCode, body: Any) : HttpResponse {
     val contentType = ContentType.parse(
-        headers.get("Content-Type") ?: throw RuntimeException("No content type found")
+        request.headers.get("Content-Type") ?: throw RuntimeException("No content type found")
     )
 
-    return HttpResponse(statusCode, contentType, body)
+    return response.apply {
+        status = statusCode
+        headers.add(HttpHeader("content-type", contentType.actual))
+        response = body
+    }
 }
 
-fun HttpRequest.respond(contentType: ContentType, body: Any) = HttpResponse(HttpStatusCode.OK, contentType, body)
+fun HttpCall.respond(contentType: ContentType, body: Any) = response.apply {
+    status = HttpStatusCode.OK
+    headers.add(HttpHeader("content-type", contentType.actual))
+    response = body
+}
 
-fun HttpRequest.respond(statusCode: HttpStatusCode, contentType: ContentType, body: Any) = HttpResponse(statusCode, contentType, body)
+fun HttpCall.respond(statusCode: HttpStatusCode, contentType: ContentType, body: Any) = response.apply {
+    status = statusCode
+    headers.add(HttpHeader("content-type", contentType.actual))
+    response = body
+}

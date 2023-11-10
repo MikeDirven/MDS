@@ -8,14 +8,15 @@ import mds.engine.enums.HttpStatusCode
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
-typealias ExceptionHandler = (call: HttpRequest, cause: Exception) -> HttpResponse
+typealias ExceptionHandler = (call: HttpRequest, cause: Throwable) -> HttpResponse
 interface MdsEngineExceptions {
-    val exceptionsToCatch: MutableMap<KClass<Exception>, ExceptionHandler>
-    val defaultHandler: (call: HttpRequest, cause: Exception) -> HttpResponse
+    val exceptionsToCatch: MutableMap<KClass<Throwable>, ExceptionHandler>
+    val defaultHandler: (call: HttpRequest, cause: Throwable) -> HttpResponse
         get() = { call, cause ->
             HttpResponse(
                 HttpStatusCode.INTERNAL_SERVER_ERROR,
                 ContentType.Application.JSON,
+                mutableListOf(),
                 cause.message?.let { HttpException(cause::class.jvmName, it) } ?: "Unknown exception"
             )
         }
