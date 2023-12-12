@@ -2,6 +2,7 @@ package mds.plugins.sessions.interfaces
 
 import mds.engine.classes.HttpCall
 import mds.engine.classes.HttpHeader
+import mds.engine.pipelines.subPipelines.ResponsePipeline
 import mds.plugins.sessions.enums.SameSite
 import mds.plugins.sessions.exceptions.SessionExceptions
 import java.util.*
@@ -30,7 +31,7 @@ class MemorySessionsProvider(override val sessionName: String, cookieConfig: Ses
             } else {
                 throw SessionExceptions.SessionNotFound(uuid)
             }
-        } ?: throw SessionExceptions.UnknownSessionType(clazz)
+        } ?: throw SessionExceptions.SessionNotFound(uuid)
     }
 
     override fun <T : Any> getSessionOrNull(clazz: KClass<T>, uuid: UUID): T? {
@@ -49,7 +50,7 @@ class MemorySessionsProvider(override val sessionName: String, cookieConfig: Ses
         return uuid
     }
 
-    override fun setSessionUUID(call: HttpCall, uuid: UUID) {
+    override fun setSessionUUID(call: ResponsePipeline, uuid: UUID) {
         val cookieBuilder: StringBuilder = java.lang.StringBuilder()
         cookieBuilder.append("${sessionName}=${uuid.toString()}")
         if(this::domain.isInitialized) cookieBuilder.append("; Domain=${this.domain}")

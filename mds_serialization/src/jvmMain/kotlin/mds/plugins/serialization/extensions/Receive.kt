@@ -3,11 +3,12 @@ package mds.plugins.serialization.extensions
 import mds.engine.classes.ContentType
 import mds.engine.classes.HttpCall
 import mds.engine.classes.HttpRequest
+import mds.engine.pipelines.subPipelines.ResponsePipeline
 import mds.engine.plugins.extensions.pluginOrNull
 import mds.plugins.serialization.ContentNegotiation
 import java.lang.RuntimeException
 
-inline fun <reified T : Any> HttpCall.receive() : T = application.pluginOrNull(ContentNegotiation).let { contentNegotiation ->
+inline fun <reified T : Any> ResponsePipeline.receive() : T = applicationPipeline.application.pluginOrNull(ContentNegotiation).let { contentNegotiation ->
     val contentType = ContentType.parse(
         request.headers.get("Content-Type") ?: throw RuntimeException("No content type found")
     )

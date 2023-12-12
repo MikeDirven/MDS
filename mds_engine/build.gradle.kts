@@ -12,9 +12,6 @@ version = "0.0.0.2"
 repositories {
     mavenCentral()
 }
-dependencies {
-    implementation(project(mapOf("path" to ":mds_logging")))
-}
 
 publishing{
     repositories {
@@ -54,6 +51,7 @@ kotlin {
             dependencies {
                 api("ch.qos.logback:logback-classic:1.4.11")
                 api(kotlin("reflect"))
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.1")
             }
         }
         val jvmTest by getting {

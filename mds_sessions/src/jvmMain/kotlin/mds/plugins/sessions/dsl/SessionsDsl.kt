@@ -2,36 +2,37 @@ package mds.plugins.sessions.dsl
 
 import mds.engine.classes.HttpCall
 import mds.engine.handlers.Routing
+import mds.engine.pipelines.subPipelines.ResponsePipeline
 import mds.engine.plugins.extensions.plugin
 import mds.plugins.sessions.Sessions
 import java.util.UUID
 
-inline fun <reified T : Any> HttpCall.getSession() : T {
+inline fun <reified T : Any> ResponsePipeline.getSession() : T {
     val sessionCookie = request.headers.get("Cookie")?.split(';')?.associate {
         val split = it.split('=')
         Pair(split[0], split[1])
-    }?.get(application.plugin(Sessions).sessionProvider.sessionName) ?: throw InternalError("cannot get cookie from headers !")
+    }?.get(applicationPipeline.application.plugin(Sessions).sessionProvider.sessionName) ?: throw InternalError("cannot get cookie from headers !")
 
     val uuid = UUID.fromString(sessionCookie)
 
-    return application.plugin(Sessions).sessionProvider.getSession(T::class, uuid)
+    return applicationPipeline.application.plugin(Sessions).sessionProvider.getSession(T::class, uuid)
 }
 
-inline fun <reified T : Any> HttpCall.getSessionOrNull() : T {
+inline fun <reified T : Any> ResponsePipeline.getSessionOrNull() : T? {
     val sessionCookie = request.headers.get("Cookie")?.split(';')?.associate {
         val split = it.split('=')
         Pair(split[0], split[1])
-    }?.get(application.plugin(Sessions).sessionProvider.sessionName) ?: throw InternalError("cannot get cookie from headers !")
+    }?.get(applicationPipeline.application.plugin(Sessions).sessionProvider.sessionName) ?: throw InternalError("cannot get cookie from headers !")
 
     val uuid = UUID.fromString(sessionCookie)
 
-    return application.plugin(Sessions).sessionProvider.getSession(T::class, uuid)
+    return applicationPipeline.application.plugin(Sessions).sessionProvider.getSessionOrNull(T::class, uuid)
 }
 
-inline fun <reified T : Any> HttpCall.setSession(session: T) : UUID {
+inline fun <reified T : Any> ResponsePipeline.setSession(session: T) : UUID {
     val sessionId : UUID
 
-    application.plugin(Sessions).sessionProvider.let { provider ->
+    applicationPipeline.application.plugin(Sessions).sessionProvider.let { provider ->
         sessionId = provider.setSession(T::class, session)
         provider.setSessionUUID(this, sessionId)
     }

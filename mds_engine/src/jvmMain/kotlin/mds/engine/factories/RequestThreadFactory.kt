@@ -7,7 +7,7 @@ class RequestThreadFactory(poolName: String) : ThreadFactory {
     private val group: ThreadGroup = Thread.currentThread().threadGroup
     private val threadNumber = AtomicInteger(1)
     private val namePrefix: String = "$poolName-" +
-            poolNumber.getAndIncrement() + "-thread-"
+            poolNumber.getAndIncrement() + "-Dispatcher-"
 
     override fun newThread(r: Runnable): Thread {
         val t = Thread(

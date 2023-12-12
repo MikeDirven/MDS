@@ -1,6 +1,7 @@
 package mds.plugins.sessions.interfaces
 
 import mds.engine.classes.HttpCall
+import mds.engine.pipelines.subPipelines.ResponsePipeline
 import java.util.UUID
 import kotlin.reflect.KClass
 
@@ -18,7 +19,7 @@ interface SessionProvider {
         TODO("Not yet implemented")
     }
 
-    fun setSessionUUID(call: HttpCall, uuid: UUID){
+    fun setSessionUUID(call: ResponsePipeline, uuid: UUID){
         TODO("Not yet implemented")
     }
 }

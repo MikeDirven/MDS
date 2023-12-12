@@ -2,11 +2,10 @@ package mds.engine.classes
 
 import mds.engine.enums.HttpStatusCode
 import mds.engine.enums.RequestMethods
-import mds.engine.handlers.Application
+import mds.engine.pipelines.ApplicationPipeline
 import java.io.BufferedWriter
 
 data class HttpRequest(
-    val application: Application,
     val protocol: String,
     val method: RequestMethods,
     val path: String,

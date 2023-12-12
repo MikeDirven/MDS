@@ -5,7 +5,6 @@ import mds.engine.MdsEngine
 import mds.engine.classes.ContentType
 import mds.engine.enums.HttpStatusCode
 import mds.engine.interfaces.install
-import mds.engine.logging.LoggingPlugin
 import mds.plugins.serialization.ContentNegotiation
 import mds.plugins.serialization.ContentNegotiation.Companion.install
 import mds.plugins.serialization.extensions.receive
@@ -18,6 +17,7 @@ import mds.plugins.sessions.interfaces.MemorySessionsProvider
 
 
 fun main(args: Array<String>) = mds.engine.MdsEngine {
+    maxPoolThreads = 10
     port = 1500
     host = "0.0.0.0"
     entryPoint = mds.engine.MdsEngine::application
@@ -29,7 +29,6 @@ data class Test(
 )
 
 fun MdsEngine.application() {
-    install(LoggingPlugin)
     install(ContentNegotiation){
         gson {
             setPrettyPrinting()
@@ -50,9 +49,7 @@ fun MdsEngine.application() {
 
         get("esmee") { call ->
             val session = call.getSession<String>()
-            println("session")
-            call.respond(
-                HttpStatusCode.OK, ContentType.Application.JSON, Test("mike", 1500))
+            call.respond(HttpStatusCode.OK, ContentType.Application.JSON, Test("mike", 1500))
         }
     }
 }

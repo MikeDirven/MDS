@@ -4,13 +4,13 @@ import mds.engine.enums.RequestMethods
 
 object Tags {
     val engine = "${Colors.cyan}Mds engine -> ${Colors.reset}"
-    fun getRequest() = "${Colors.green}${Thread.currentThread().name} -> ${Colors.reset}"
-    fun postRequest() = "${Colors.yellow}${Thread.currentThread().name} -> ${Colors.reset}"
-    fun putRequest() = "${Colors.blue}${Thread.currentThread().name} -> ${Colors.reset}"
-    fun patchRequest() = "${Colors.purple}${Thread.currentThread().name} -> ${Colors.reset}"
-    fun deleteRequest() = "${Colors.red}${Thread.currentThread().name} -> ${Colors.reset}"
-    fun headRequest() = "${Colors.green}${Thread.currentThread().name} -> ${Colors.reset}"
-    fun optionsRequest() = "${Colors.purple}${Thread.currentThread().name} -> ${Colors.reset}"
+    fun getRequest() = "${Colors.green}GET -> ${Colors.reset}"
+    fun postRequest() = "${Colors.yellow}POST -> ${Colors.reset}"
+    fun putRequest() = "${Colors.blue}PUT -> ${Colors.reset}"
+    fun patchRequest() = "${Colors.purple}PATCH -> ${Colors.reset}"
+    fun deleteRequest() = "${Colors.red}DELETE -> ${Colors.reset}"
+    fun headRequest() = "${Colors.green}HEAD -> ${Colors.reset}"
+    fun optionsRequest() = "${Colors.purple}OPTIONS -> ${Colors.reset}"
 
     fun methodColor(method: RequestMethods) : String = when(method){
         RequestMethods.GET -> getRequest()
