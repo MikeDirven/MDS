@@ -20,7 +20,7 @@ fun Route.route(path: String = "", block: Route.() -> Route) = Route(
     this.path.trimEnd('/').plus('/').plus(path.trimStart('/'))
 )
 
-fun Routing.get(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
+fun Routing.get(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
     it.path == path
 }?.apply {
     requestHandler.add(RequestHandler(path, RequestMethods.GET, block))
@@ -32,7 +32,7 @@ fun Routing.get(path: String = "", block: (call: ResponsePipeline) -> HttpRespon
     routes.add(this)
 }
 
-fun Routing.post(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
+fun Routing.post(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
     it.path == path
 }?.apply {
     requestHandler.add(RequestHandler(path, RequestMethods.POST, block))
@@ -44,7 +44,7 @@ fun Routing.post(path: String = "", block: (call: ResponsePipeline) -> HttpRespo
     routes.add(this)
 }
 
-fun Routing.put(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
+fun Routing.put(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
     it.path == path
 }?.apply {
     requestHandler.add(RequestHandler(path, RequestMethods.PUT, block))
@@ -56,7 +56,7 @@ fun Routing.put(path: String = "", block: (call: ResponsePipeline) -> HttpRespon
     routes.add(this)
 }
 
-fun Routing.patch(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
+fun Routing.patch(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = routes.firstOrNull {
     it.path == path
 }?.apply {
     requestHandler.add(RequestHandler(path, RequestMethods.PATCH, block))
@@ -68,7 +68,7 @@ fun Routing.patch(path: String = "", block: (call: ResponsePipeline) -> HttpResp
     routes.add(this)
 }
 
-fun Route.get(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = this.apply {
+fun Route.get(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = this.apply {
     this.requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
@@ -78,7 +78,7 @@ fun Route.get(path: String = "", block: (call: ResponsePipeline) -> HttpResponse
     )
 }
 
-fun Route.post(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = requestHandler.add(
+fun Route.post(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
@@ -86,7 +86,7 @@ fun Route.post(path: String = "", block: (call: ResponsePipeline) -> HttpRespons
         )
     )
 
-fun Route.put(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = requestHandler.add(
+fun Route.put(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,
@@ -94,7 +94,7 @@ fun Route.put(path: String = "", block: (call: ResponsePipeline) -> HttpResponse
         )
     )
 
-fun Route.patch(path: String = "", block: (call: ResponsePipeline) -> HttpResponse) = requestHandler.add(
+fun Route.patch(path: String = "", block: suspend (call: ResponsePipeline) -> HttpResponse) = requestHandler.add(
         RequestHandler(
             path = this.path.trimEnd('/').plus('/').plus(path.trimStart('/')),
             RequestMethods.GET,

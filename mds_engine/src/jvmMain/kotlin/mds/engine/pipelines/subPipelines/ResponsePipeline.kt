@@ -1,5 +1,7 @@
 package mds.engine.pipelines.subPipelines
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mds.engine.classes.HttpRequest
 import mds.engine.classes.HttpResponse
 import mds.engine.enums.Hook
@@ -13,7 +15,7 @@ class ResponsePipeline(
 
     var response : HttpResponse = HttpResponse()
 
-    internal fun handleResponseRequest(){
+    internal suspend fun handleResponseRequest(){
         try {
             applicationPipeline.requestHandler.handler(this)
 
@@ -31,12 +33,14 @@ class ResponsePipeline(
             applicationPipeline.application.applicationHooks.filter { it.hook == Hook.RESPONSE_READY }.forEach {
                 it.function(applicationPipeline.application, this, response)
             }
-            applicationPipeline.socketWriter.write(response.toResponseString())
-            applicationPipeline.socketWriter.flush()
+            withContext(Dispatchers.IO) {
+                applicationPipeline.socketWriter.write(response.toResponseString())
+                applicationPipeline.socketWriter.flush()
 
-            applicationPipeline.socketReader.close()
-            applicationPipeline.socketWriter.close()
-            applicationPipeline.socket.close()
+                applicationPipeline.socketReader.close()
+                applicationPipeline.socketWriter.close()
+                applicationPipeline.socket.close()
+            }
         }
     }
 }

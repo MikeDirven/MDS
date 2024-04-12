@@ -1,21 +1,27 @@
 package mds.engine.interfaces
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 
 interface MdsEngineRequests {
-    fun readRequestBody(reader: BufferedReader, contentLength: Int): String {
+    suspend fun readRequestBody(reader: BufferedReader, contentLength: Int): String {
         val requestBody = CharArray(contentLength)
-        reader.read(requestBody, 0, contentLength)
+        withContext(Dispatchers.IO) {
+            reader.read(requestBody, 0, contentLength)
+        }
 
         return String(requestBody)
     }
 
-    fun readRequestHeaders(reader: BufferedReader): Map<String, String> {
+    suspend fun readRequestHeaders(reader: BufferedReader): Map<String, String> {
         val requestHeaders: MutableMap<String, String> = mutableMapOf()
         var line: String?
 
         while (true){
-            line = reader.readLine()
+            line = withContext(Dispatchers.IO) {
+                reader.readLine()
+            }
             if (line.isNullOrEmpty())
                 break
 
@@ -30,7 +36,7 @@ interface MdsEngineRequests {
         return requestHeaders
     }
 
-    fun String.readQueryParameters(): Map<String, String> =  mutableMapOf<String, String>().also { map ->
+    suspend fun String.readQueryParameters(): Map<String, String> =  mutableMapOf<String, String>().also { map ->
         if(this.isNotEmpty()) this.split("&").forEach { queryEntry ->
             queryEntry.split("=").let { parsedEntry ->
                 map.put(parsedEntry[0], parsedEntry[1])
@@ -38,7 +44,7 @@ interface MdsEngineRequests {
         }
     }
 
-    fun sendResponseBody(responseBody: String): String {
+    suspend fun sendResponseBody(responseBody: String): String {
         // Handle GET request
         return responseBody
     }

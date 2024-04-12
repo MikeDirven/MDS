@@ -1,5 +1,7 @@
 package mds.engine.pipelines.subPipelines
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mds.engine.classes.HttpRequest
 import mds.engine.enums.Hook
 import mds.engine.interfaces.MdsEngineRequests
@@ -11,7 +13,7 @@ class RequestPipeLine(
     val request: HttpRequest
 ) : Pipeline.SubPipeline, MdsEngineRequests {
 
-    internal fun handleIncomingRequest(){
+    internal suspend fun handleIncomingRequest(){
         try {
             // Receive Headers
             request.headers = readRequestHeaders(applicationPipeline.socketReader)
@@ -24,12 +26,15 @@ class RequestPipeLine(
             applicationPipeline.application.applicationHooks.filter { it.hook == Hook.RESPONSE_READY }.forEach {
                 it.function(applicationPipeline.application, this, response)
             }
-            applicationPipeline.socketWriter.write(response.toResponseString())
-            applicationPipeline.socketWriter.flush()
+            withContext(Dispatchers.IO) {
+                applicationPipeline.socketWriter.write(response.toResponseString())
+                applicationPipeline.socketWriter.flush()
 
-            applicationPipeline.socketReader.close()
-            applicationPipeline.socketWriter.close()
-            applicationPipeline.socket.close()
+                applicationPipeline.socketReader.close()
+                applicationPipeline.socketWriter.close()
+                applicationPipeline.socket.close()
+            }
+
         }
     }
 }

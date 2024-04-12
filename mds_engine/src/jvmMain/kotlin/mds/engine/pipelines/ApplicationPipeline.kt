@@ -1,26 +1,32 @@
 package mds.engine.pipelines
 
-import mds.engine.classes.HttpCall
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mds.engine.classes.HttpRequest
-import mds.engine.classes.HttpResponse
 import mds.engine.classes.RequestHandler
 import mds.engine.enums.Hook
 import mds.engine.enums.RequestMethods
 import mds.engine.handlers.Application
+import mds.engine.interfaces.MdsEngineExceptions
 import mds.engine.interfaces.MdsEngineRequests
 import mds.engine.logging.Tags
 import mds.engine.logging.extensions.info
 import mds.engine.pipelines.subPipelines.ReceivePipeline
 import mds.engine.pipelines.subPipelines.RequestPipeLine
 import mds.engine.pipelines.subPipelines.ResponsePipeline
+import mds.exceptions.NotFoundException
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.Socket
-import java.nio.channels.Pipe
+import java.net.SocketOptions
+import kotlin.coroutines.CoroutineContext
 
 class ApplicationPipeline(
+    private val coroutineContext: CoroutineContext,
     val application: Application,
     internal val socket: Socket,
     val resolve: ApplicationPipeline.() -> Unit
@@ -36,35 +42,45 @@ class ApplicationPipeline(
     lateinit var responsePipeline: ResponsePipeline
 
     init {
-        try {
-            handleIncomingPipeline()
-        } catch (e: Throwable){
-            val response = application.exceptionsToCatch.get(e::class)?.invoke(this, e) ?: application.defaultHandler.invoke(this, e)
+        CoroutineScope(coroutineContext).launch {
+            try {
+                handleIncomingPipeline()
+            } catch (e: Throwable) {
+                val response =
+                    application.exceptionsToCatch.get(e::class)?.invoke(this@ApplicationPipeline, e) ?: application.defaultHandler.invoke(
+                        this@ApplicationPipeline,
+                        e
+                    )
 
-            application.applicationHooks.filter { it.hook == Hook.RESPONSE_READY }.forEach {
-                it.function(application, this, response)
+                application.applicationHooks.filter { it.hook == Hook.RESPONSE_READY }.forEach {
+                    it.function(application, this@ApplicationPipeline, response)
+                }
+                socketWriter.write(response.toResponseString())
+                socketWriter.flush()
+
+                socketReader.close()
+                socketWriter.close()
+                socket.close()
             }
-            socketWriter.write(response.toResponseString())
-            socketWriter.flush()
-
-            socketReader.close()
-            socketWriter.close()
-            socket.close()
         }
     }
 
-    private fun handleIncomingPipeline(){
-        socketWriter = BufferedWriter(OutputStreamWriter(socket.getOutputStream()))
-        socketReader = BufferedReader(InputStreamReader(socket.getInputStream()))
-        val requestReader = socketReader.readLine().split(" ").let { requestLine ->
-            HttpRequest(
+    private suspend fun handleIncomingPipeline(){
+        val requestReader: HttpRequest
+        withContext(Dispatchers.IO) {
+            socketWriter = BufferedWriter(OutputStreamWriter(socket.getOutputStream()))
+            socketReader = BufferedReader(InputStreamReader(socket.getInputStream()))
+            requestReader = socketReader.readLine().split(" ").let { requestLine ->
+                HttpRequest(
                     method = RequestMethods.valueOf(requestLine[0]),
                     path = requestLine[1].substringBefore("?"),
                     queryParams = requestLine[1].substringAfterLast("?", "").readQueryParameters(),
                     protocol = requestLine[2],
                     outPutWriter = socketWriter
                 )
+            }
         }
+
 
         application.info("${Tags.methodColor(requestReader.method)} ${requestReader.path} - ${requestReader.queryParams}")
 
@@ -82,7 +98,7 @@ class ApplicationPipeline(
             } else null
         }
 
-        requestHandler = routesAvailable.firstNotNullOf { it.firstOrNull { it.method == requestReader.method } }
+        requestHandler = routesAvailable.firstNotNullOfOrNull { it.firstOrNull { it.method == requestReader.method } } ?: throw NotFoundException()
         application.info("${Tags.methodColor(requestReader.method)} Matched route handler ${requestHandler.method}:${requestHandler.path}")
 
         // Construct request pipeline
@@ -93,18 +109,21 @@ class ApplicationPipeline(
         requestPipeline.handleIncomingRequest()
     }
 
-    internal fun handleOutgoingPipeline(){
-        socketWriter.write(
-            sendResponseBody(
-                responsePipeline.response.toResponseString()
-                    ?: "HTTP/1.1 404 Not Found\r\n\r\n"
+    internal suspend fun handleOutgoingPipeline(){
+        withContext(Dispatchers.IO) {
+            socketWriter.write(
+                sendResponseBody(
+                    responsePipeline.response.toResponseString()
+                        ?: "HTTP/1.1 404 Not Found\r\n\r\n"
+                )
             )
-        )
-        socketWriter.flush()
+            socketWriter.flush()
 
-        socketReader.close()
-        socketWriter.close()
-        socket.close()
+            socketReader.close()
+            socketWriter.close()
+            socket.close()
+        }
+
 
         // Response send hook
         application.applicationHooks.filter { it.hook == Hook.RESPONSE_SEND }.forEach {

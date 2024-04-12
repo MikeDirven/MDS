@@ -75,10 +75,10 @@ class MdsEngine(
         }
 
         // Configure socket
-        server = ServerSocket(port,50, InetAddress.getByName(host))
+        server = ServerSocket(port, Int.MAX_VALUE, InetAddress.getByName(host))
     }
 
-    fun getElapsedTimeInSecondsWithDecimal(): String {
+    private fun getElapsedTimeInSecondsWithDecimal(): String {
         val currentTimeMillis = System.currentTimeMillis()
         val elapsedTimeMillis = currentTimeMillis - initializeTimeStamp
         val elapsedTimeInSeconds = elapsedTimeMillis / 1000.0
@@ -97,10 +97,11 @@ class MdsEngine(
 
         while (!interrupted()){
             val clientSocket = server.accept()
-            threadPools.random().dispatch(EmptyCoroutineContext) {
-                    ApplicationPipeline(this, clientSocket){
-
-                    }
+            val context = EmptyCoroutineContext
+            threadPools.random().dispatch(context) {
+                ApplicationPipeline(context, this, clientSocket){
+                    //TODO: Hook for pipeline dispatched
+                }
             }
         }
 

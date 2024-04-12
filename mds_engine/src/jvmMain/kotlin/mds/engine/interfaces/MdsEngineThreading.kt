@@ -23,7 +23,7 @@ interface MdsEngineThreading {
 
     fun createThreadPoolList(){
         threadPools = buildList {
-            for(i in 0..(maxPools + 1)){
+            for(i in 1..(maxPools + 1)){
                 this.add(createDispatcher())
             }
         }
