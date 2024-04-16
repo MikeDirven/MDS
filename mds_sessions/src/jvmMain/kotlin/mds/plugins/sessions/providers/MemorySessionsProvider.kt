@@ -1,14 +1,16 @@
-package mds.plugins.sessions.interfaces
+package mds.plugins.sessions.providers
 
-import mds.engine.classes.HttpCall
 import mds.engine.classes.HttpHeader
 import mds.engine.pipelines.subPipelines.ResponsePipeline
 import mds.plugins.sessions.enums.SameSite
 import mds.plugins.sessions.exceptions.SessionExceptions
+import mds.plugins.sessions.interfaces.SessionCookieConfig
+import mds.plugins.sessions.interfaces.SessionProvider
 import java.util.*
 import kotlin.reflect.KClass
 
-class MemorySessionsProvider(override val sessionName: String, cookieConfig: SessionCookieConfig.() -> Unit) : SessionProvider, SessionCookieConfig {
+class MemorySessionsProvider(override val sessionName: String, cookieConfig: SessionCookieConfig.() -> Unit) : SessionProvider,
+    SessionCookieConfig {
     val sessions: MutableMap<KClass<*>, MutableMap<UUID, Any>> = mutableMapOf()
     override lateinit var domain: String
     override lateinit var expires: Date

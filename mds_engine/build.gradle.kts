@@ -7,7 +7,7 @@ plugins {
 val user: String = System.getenv("GITHUB_USER")
 val key: String = System.getenv("GITHUB_KEY")
 group = "nl.md-systems"
-version = "0.0.0.2"
+version = "0.0.0.4"
 
 repositories {
     mavenCentral()
