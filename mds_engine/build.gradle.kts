@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.9.0"
+    kotlin("multiplatform")
     id("maven-publish")
     application
 }
@@ -7,7 +7,7 @@ plugins {
 val user: String = System.getenv("GITHUB_USER")
 val key: String = System.getenv("GITHUB_KEY")
 group = "nl.md-systems"
-version = "0.0.0.4"
+version = "0.0.0.1"
 
 repositories {
     mavenCentral()

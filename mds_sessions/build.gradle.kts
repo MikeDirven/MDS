@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.9.0"
+    kotlin("multiplatform")
     id("maven-publish")
 }
 
@@ -48,8 +48,4 @@ kotlin {
             }
         }
     }
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
 }

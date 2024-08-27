@@ -3,6 +3,7 @@ package mds.engine.interfaces
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.newFixedThreadPoolContext
 import mds.engine.factories.RequestThreadFactory
 import java.util.concurrent.*
 
@@ -19,7 +20,10 @@ interface MdsEngineThreading {
             threadBuilder
         )
     }
-    fun createDispatcher() = newCachedThreadPool(maxPoolThreads, RequestThreadFactory("MDS_EventPool")).asCoroutineDispatcher().limitedParallelism(maxPoolThreads)
+    fun createDispatcher() = newCachedThreadPool(
+        maxPoolThreads,
+        RequestThreadFactory("MDS_EventPool")
+    ).asCoroutineDispatcher().limitedParallelism(maxPoolThreads)
 
     fun createThreadPoolList(){
         threadPools = buildList {
