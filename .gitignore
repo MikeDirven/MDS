@@ -3,5 +3,5 @@
 /build/
 /build/classes/kotlin/main/
 .idea
-/gradle
+/gradle/wrapper
 */build/

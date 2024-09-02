@@ -1,0 +1,39 @@
+[versions]
+kotlin = "2.0.0"
+coroutines = "1.8.0"
+serialization-json = "1.6.3"
+exposed = "0.47.0"
+reflection = "0.10.2"
+bouncyCastle = "1.70"
+gson = "2.10.1"
+logback = "1.4.11"
+
+[libraries]
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+reflection = { module = "org.reflections:reflections", version.ref = "reflection"}
+
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson"}
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback"}
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization-json" }
+
+exposed-core = { group ="org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed"}
+exposed-jdbc = { group ="org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed"}
+exposed-dao = { group ="org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed"}
+exposed-crypt = { group ="org.jetbrains.exposed", name = "exposed-crypt", version.ref = "exposed"}
+exposed-java-time = { group ="org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed"}
+
+cipher-bouncycastle = { group = "org.bouncycastle", name = "bcprov-jdk15on", version.ref = "bouncyCastle"}
+
+[bundles]
+exposed = [
+    "exposed-core",
+    "exposed-jdbc",
+    "exposed-dao",
+    "exposed-crypt",
+    "exposed-java-time"
+]
+
+[plugins]
+kotlinjvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinmultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
