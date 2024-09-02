@@ -10,7 +10,7 @@ import java.io.File
 
 fun main() = EngineMain {
     socket {
-        host = "localhost"
+        host = "0.0.0.0"
         port = 8008
     }
 
@@ -29,8 +29,9 @@ fun EngineMain.routes(){
             get {
                 logger.info(this.request.path)
                 respondText(
-                    File("C:\\Users\\Mike\\Desktop\\MDS\\large-file.json")
-                        .readText()
+//                    File("C:\\Users\\Mike\\Desktop\\MDS\\large-file.json")
+//                        .readText()
+                    "Mike is goed bezig"
                 )
             }
         }

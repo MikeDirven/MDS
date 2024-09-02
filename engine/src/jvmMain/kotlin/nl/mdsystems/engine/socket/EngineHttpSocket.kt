@@ -30,15 +30,17 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
     }
 
     // Create context
-    internal val socket = HttpServer.create(
-        InetSocketAddress(
-            InetAddress.getByName(
-                EnvironmentConfig.HOST ?: configuration.host
+    internal val socket: HttpServer by lazy {
+        HttpServer.create(
+            InetSocketAddress(
+                InetAddress.getByName(
+                    EnvironmentConfig.HOST ?: configuration.host
+                ),
+                EnvironmentConfig.PORT ?: configuration.port,
             ),
-            EnvironmentConfig.PORT ?: configuration.port
-        ),
-        configuration.backlog
-    )
+            configuration.backlog
+        )
+    }
 
     fun EngineMain.createSocketContext() {
 
@@ -115,7 +117,9 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
         logging.info("Application started in: ${getElapsedTimeInSecondsWithDecimal()} seconds")
 
         // Keep thread running until interrupted
-        while (!isInterrupted) {
+        while (!Thread.currentThread().isInterrupted) {
+            // Keep thread alive without busy-waiting
+            Thread.sleep(100)
         }
 
         socket.stop(0)

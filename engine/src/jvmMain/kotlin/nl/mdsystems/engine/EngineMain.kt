@@ -12,7 +12,6 @@ import nl.mdsystems.engine.socket.EngineHttpSocket
 import nl.mdsystems.engine.socket.interfaces.EngineSocketConfig
 import nl.mdsystems.engine.threading.MdsEngineThreading
 import nl.mdsystems.engine.threading.interfaces.EngineThreadPoolConfiguration
-import nl.mdsystems.engine.types.MdsModule
 import kotlin.system.exitProcess
 
 class EngineMain private constructor(
@@ -27,7 +26,7 @@ class EngineMain private constructor(
     init {
         setStartingTime()
 
-        serverSocket.apply {
+        serverSocket.run {
             createSocketContext()
             setRequestExecutor(threading::selectLeastBusyPool)
         }
@@ -42,13 +41,6 @@ class EngineMain private constructor(
     }
 
 
-
-    /**
-     * This function is the main execution loop of the MDS Engine.
-     * It initializes the server socket, sets the request executor, and starts the server.
-     *
-     * @return Nothing. This function does not return any value.
-     */
     override fun run() {
         serverSocket.apply {
             startServer()
@@ -57,12 +49,6 @@ class EngineMain private constructor(
         shutDown()
     }
 
-    /**
-     * This function is responsible for shutting down the MDS Engine.
-     * It closes all the thread pools, logs a shutdown message, and then terminates the process.
-     *
-     * @return Nothing. This function does not return any value.
-     */
     private fun shutDown() {
         serverSocket.apply {
             stopServer()

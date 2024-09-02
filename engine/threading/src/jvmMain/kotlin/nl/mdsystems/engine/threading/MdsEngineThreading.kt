@@ -7,7 +7,9 @@ import nl.mdsystems.engine.logging.MdsEngineLogging
 import nl.mdsystems.engine.logging.functions.info
 import nl.mdsystems.engine.threading.interfaces.EngineThreadPoolConfiguration
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * A class responsible for managing a set of thread pools for the MdsEngine.
@@ -29,7 +31,7 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
         override var poolName: String = "MdsEngineThreadPool"
     }
 
-    private val threadPools = CopyOnWriteArrayList<ExecutorCoroutineDispatcher>()
+    private val threadPools = ConcurrentHashMap<ExecutorCoroutineDispatcher, AtomicInteger>()
 
     private val workloadQueue = PriorityQueue<Pair<ExecutorCoroutineDispatcher, Int>>(compareBy { it.second })
 
@@ -45,20 +47,25 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
      * @throws IllegalStateException If no available thread pools are found.
      */
     fun selectLeastBusyPool(): ExecutorCoroutineDispatcher {
-        val entry = workloadQueue.poll()
-        if (entry != null) {
-            updateWorkload(entry.first, entry.second + 1)
-            return entry.first
+        var leastBusyCoroutine: ExecutorCoroutineDispatcher? = null
+        var minWorkload = Int.MAX_VALUE
+
+        for((dispatcher, workload) in threadPools){
+            val currentWorkload = workload.get()
+            if(currentWorkload < minWorkload) {
+                minWorkload = currentWorkload
+                leastBusyCoroutine = dispatcher
+            }
         }
-        throw IllegalStateException("No available thread pools")
+
+        return leastBusyCoroutine ?: throw IllegalStateException("No available thread pools")
     }
 
     fun closeAllPools() {
         MdsEngineLogging.get()?.info("Closing all thread pools")
 
-        threadPools.forEach { it.close() }
+        threadPools.keys.forEach { it.close() }
         threadPools.clear()
-        workloadQueue.clear()
 
         MdsEngineLogging.get()?.info("All thread pools closed")
     }
@@ -89,8 +96,9 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
                 configuration.maxPoolThreads,
                 configuration.poolName + "-$poolNumber"
             )
-            threadPools.add(dispatcher)
-            updateWorkload(dispatcher, 0) // Initialize workload as 0
+
+            // Initialize workload as 0
+            threadPools[dispatcher] = AtomicInteger(0)
         }
         MdsEngineLogging.get()?.info("Thread pools initialized")
     }
