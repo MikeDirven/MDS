@@ -19,7 +19,7 @@ fun RoutingBuilder.route(
             = this@route.logging
 
         override val parentPath: String
-            = "/${path.trim('/')}"
+            = "$rootPath/${path.trim('/')}"
 
         // handlers
         override var getHandler: RouteHandler? = null

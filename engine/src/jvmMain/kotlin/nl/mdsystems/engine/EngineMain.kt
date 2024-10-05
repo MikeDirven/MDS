@@ -63,7 +63,10 @@ class EngineMain private constructor(
     }
 
     companion object {
-        operator fun invoke(config: (EngineMainConfig.() -> Unit)? = null) = run {
+        operator fun invoke(
+            config: (EngineMainConfig.() -> Unit)? = null
+        ) = run {
+            
             EngineMain(
                 object : EngineMainConfig {
                     override var logging: (EngineLoggingConfig.() -> Unit)? = null

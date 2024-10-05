@@ -8,7 +8,7 @@ import nl.mdsystems.engine.routing.dsl.get
 import nl.mdsystems.engine.routing.dsl.route
 import java.io.File
 
-fun main() = EngineMain {
+fun main(): Unit = EngineMain() {
     socket {
         host = "0.0.0.0"
         port = 8008
