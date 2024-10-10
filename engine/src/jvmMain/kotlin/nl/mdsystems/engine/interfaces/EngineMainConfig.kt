@@ -13,35 +13,55 @@ interface EngineMainConfig {
     var socket: (EngineSocketConfig.() -> Unit)?
     var routing: (EngineRoutingConfig.() -> Unit)?
     var modules: List<MdsModule>
-}
 
-fun EngineMainConfig.logging(config: EngineLoggingConfig.() -> Unit) {
-    logging = config
-}
+    fun logging(config: EngineLoggingConfig.() -> Unit) {
+        logging = config
+    }
 
-fun EngineMainConfig.threading(config: EngineThreadPoolConfiguration.() -> Unit) {
-    threading = config
-}
+    fun threading(config: EngineThreadPoolConfiguration.() -> Unit) {
+        threading = config
+    }
 
-fun EngineMainConfig.socket(config: EngineSocketConfig.() -> Unit) {
-    socket = config
-}
+    fun socket(config: EngineSocketConfig.() -> Unit) {
+        socket = config
+    }
 
-fun EngineMainConfig.routing(config: EngineRoutingConfig.() -> Unit) {
-    routing = config
-}
+    fun routing(config: EngineRoutingConfig.() -> Unit) {
+        routing = config
+    }
 
-fun EngineMainConfig.modules(vararg modules: MdsModule) {
-    this.modules = modules.toList()
-}
+    fun modules(vararg modulesToAdd: MdsModule) {
+        modules = buildList {
+            addAll(modules)
+            addAll(modulesToAdd)
+        }
+    }
 
-fun EngineMainConfig.modules(modules: List<MdsModule>) {
-    this.modules = modules
-}
+    fun modules(modulesToAdd: List<MdsModule>) {
+        modules = buildList {
+            addAll(modules)
+            addAll(modulesToAdd)
+        }
+    }
 
-fun EngineMainConfig.addModule(module: MdsModule) {
-    this.modules = buildList {
-        addAll(this@addModule.modules)
-        add(module)
+    fun addModule(module: MdsModule) {
+        modules = buildList {
+            addAll(modules)
+            add(module)
+        }
+    }
+
+    operator fun List<MdsModule>.plus(module: MdsModule){
+        modules = buildList {
+            addAll(modules)
+            add(module)
+        }
+    }
+
+    infix fun List<MdsModule>.add(module: MdsModule){
+        modules = buildList {
+            addAll(modules)
+            add(module)
+        }
     }
 }
