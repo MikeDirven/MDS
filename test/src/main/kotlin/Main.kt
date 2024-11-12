@@ -4,9 +4,9 @@ import nl.mdsystems.engine.EngineMain
 import nl.mdsystems.engine.extensions.routing
 import nl.mdsystems.engine.interfaces.*
 import nl.mdsystems.engine.logging.functions.info
+import nl.mdsystems.engine.mdsModule
 import nl.mdsystems.engine.routing.dsl.get
 import nl.mdsystems.engine.routing.dsl.route
-import java.io.File
 
 fun main(): Unit = EngineMain {
     socket {
@@ -18,10 +18,13 @@ fun main(): Unit = EngineMain {
         rootPath = "henk"
     }
 
-    modules + EngineMain::routes
-    modules add EngineMain::routes
-    addModule(EngineMain::routes)
-    modules(EngineMain::routes)
+    modules {
+        + moduleTest()
+    }
+}
+
+fun moduleTest() = mdsModule {
+
 }
 
 fun EngineMain.routes(){
