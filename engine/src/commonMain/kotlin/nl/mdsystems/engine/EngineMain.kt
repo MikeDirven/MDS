@@ -9,7 +9,7 @@ class MdsModule internal constructor(
 
 fun mdsModule(name: String = "", entry: EngineMain.() -> Unit) : MdsModule {
     return MdsModule(
-        name,
+        name.ifBlank { entry.toString().substringBefore("$$") },
         entry
     )
 }

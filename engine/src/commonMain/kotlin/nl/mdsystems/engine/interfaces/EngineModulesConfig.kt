@@ -6,6 +6,7 @@ import java.io.File
 interface EngineModulesConfig {
     var waitForModules: Boolean
     var externalModulesDirectories: List<File>
+    var dependenciesDirectories: List<File>
     var internalModules: List<MdsModule>
 
     fun directories(vararg directories: File) {
@@ -25,6 +26,27 @@ interface EngineModulesConfig {
     fun addDirectory(directory: File) {
         externalModulesDirectories = buildList {
             addAll(externalModulesDirectories)
+            add(directory)
+        }
+    }
+
+    fun dependenciesDirectories(vararg directories: File) {
+        dependenciesDirectories = buildList {
+            addAll(dependenciesDirectories)
+            addAll(directories)
+        }
+    }
+
+    fun dependenciesDirectories(directories: List<File>) {
+        dependenciesDirectories = buildList {
+            addAll(dependenciesDirectories)
+            addAll(directories)
+        }
+    }
+
+    fun addDependencyDirectory(directory: File) {
+        dependenciesDirectories = buildList {
+            addAll(dependenciesDirectories)
             add(directory)
         }
     }

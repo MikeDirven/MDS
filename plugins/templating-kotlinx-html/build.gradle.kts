@@ -1,6 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlinjvm)
-    application
+    kotlin("jvm") version "2.1.0"
 }
 
 group = "nl.md-systems"
@@ -12,13 +11,10 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation(project(":engine"))
-    implementation(project(":plugins:templating-kotlinx-html"))
+    implementation(project(":engine:pipelines"))
+    api(libs.kotlinx.html)
 }
 
 tasks.test {
     useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(21)
 }

@@ -5,6 +5,7 @@ import nl.mdsystems.engine.routing.interfaces.EngineRoutingConfig
 import nl.mdsystems.engine.socket.interfaces.EngineSocketConfig
 import nl.mdsystems.engine.threading.interfaces.EngineThreadPoolConfiguration
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual interface EngineMainConfig {
     var logging: (EngineLoggingConfig.() -> Unit)?
     var threading: (EngineThreadPoolConfiguration.() -> Unit)?

@@ -16,13 +16,14 @@ import nl.mdsystems.engine.threading.MdsEngineThreading
 import nl.mdsystems.engine.threading.interfaces.EngineThreadPoolConfiguration
 import kotlin.system.exitProcess
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class EngineMain private constructor(
     config: EngineMainConfig
 ) : Thread("Mds_Engine_Thread") {
     internal val logging = MdsEngineLogging(config.logging)
     internal val serverSocket = EngineHttpSocket(config.socket)
     internal val threading = MdsEngineThreading(config.threading)
-    internal val routing = MdsEngineRouting(serverSocket::socket, ::logging, config.routing)
+    internal val routing = MdsEngineRouting(serverSocket::socket, config.routing)
     internal val modules = MdsEngineModules(config.modules)
     internal val metrics = MdsEngineMetrics()
 
@@ -32,6 +33,11 @@ actual class EngineMain private constructor(
         serverSocket.run {
             createSocketContext()
             setRequestExecutor(threading::selectLeastBusyPool)
+        }
+
+        // Startup modules loader
+        modules.run {
+            loadModules()
         }
 
         // Log startup message

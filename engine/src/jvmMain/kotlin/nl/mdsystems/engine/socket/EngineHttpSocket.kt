@@ -6,11 +6,9 @@ import nl.mdsystems.engine.EngineMain
 import nl.mdsystems.engine.extensions.getElapsedTimeInSecondsWithDecimal
 import nl.mdsystems.engine.logging.functions.error
 import nl.mdsystems.engine.logging.functions.info
-import nl.mdsystems.engine.pipelines.ResponsePipeline
 import nl.mdsystems.engine.socket.interfaces.EngineSocketConfig
 import java.net.InetAddress
 import java.net.InetSocketAddress
-import java.nio.charset.Charset
 import kotlin.coroutines.EmptyCoroutineContext
 
 class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
@@ -44,24 +42,6 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
 
     fun EngineMain.createSocketContext() {
 
-
-//        socket.createContext("/henk") { connection ->
-//            try {
-//                ResponsePipeline(connection)
-//            } catch (exception: Exception) {
-//                logging.error(exception)
-//                connection.close()
-//            }
-//
-//            logging.info("${connection.protocol} - ${connection.remoteAddress} - ${connection.requestMethod}")
-//            val response = "Hello, World!".toByteArray()
-//            val requestBody = connection.requestBody.readAllBytes()
-//            logging.info("Received request: ${requestBody.toString(Charset.defaultCharset())}")
-//            connection.responseHeaders.set("Content-Type", "application/json")
-//            connection.sendResponseHeaders(200, requestBody.size.toLong())
-//            connection.responseBody.write(requestBody)
-//            connection.close()
-//        }
     }
 
     /**

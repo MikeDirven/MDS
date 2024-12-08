@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlinmultiplatform)
 }
@@ -6,9 +8,10 @@ group = "nl.mdsystems"
 version = "0.0.0.1"
 
 kotlin {
+    jvmToolchain(21)
     jvm() {
-        compilations.all {
-            kotlinOptions.jvmTarget = "17"
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_21
         }
         withJava()
         testRuns["test"].executionTask.configure {
@@ -23,6 +26,7 @@ kotlin {
                 api(project(":engine:metrics"))
                 api(project(":engine:routing"))
                 api(project(":engine:pipelines"))
+                implementation(project(":utils"))
                 
                 implementation(libs.kotlin.coroutines)
             }

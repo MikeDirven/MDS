@@ -55,6 +55,7 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
             if(currentWorkload < minWorkload) {
                 minWorkload = currentWorkload
                 leastBusyCoroutine = dispatcher
+                updateWorkload(dispatcher, currentWorkload + 1)
             }
         }
 

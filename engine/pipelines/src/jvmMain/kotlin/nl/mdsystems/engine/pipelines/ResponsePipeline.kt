@@ -13,10 +13,9 @@ import nl.mdsystems.engine.pipelines.types.AttributeKey
 import kotlin.reflect.KProperty0
 
 class ResponsePipeline(
-    private val connection: HttpExchange,
-    private val logging: KProperty0<MdsEngineLogging>
+    val connection: HttpExchange
 ) : PipelineRoutesBuilder {
-    val logger: MdsEngineLogging by logging
+    val logger by MdsEngineLogging
     val attributes: MutableMap<AttributeKey<*>, Any> = mutableMapOf()
 
     val request = object : RequestObject {
@@ -40,20 +39,6 @@ class ResponsePipeline(
                     connection.responseBody.write(it)
                 }
             }
-    }
-
-    fun respondText(statusCode: HttpStatusCode = HttpStatusCode.OK, text: String){
-        val byteArray = text.toByteArray()
-        connection.responseHeaders.add("Content-Type", "text/plain")
-        connection.sendResponseHeaders(statusCode.code, byteArray.size.toLong())
-        connection.responseBody.write(byteArray)
-    }
-
-    fun respondText(text: String){
-        val byteArray = text.toByteArray()
-        connection.responseHeaders.add("Content-Type", "text/plain")
-        connection.sendResponseHeaders(HttpStatusCode.OK.code, byteArray.size.toLong())
-        connection.responseBody.write(byteArray)
     }
 
     /**
