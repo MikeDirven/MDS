@@ -81,7 +81,7 @@ class ResponsePipeline(
             UriConstants.PATH_PARAMETERS.name
         ) as? Map<String, Int>
 
-        val pathSegments = connection.requestURI.path.split("/")
+        val pathSegments = connection.requestURI.path.trim('/').split("/")
 
         return buildMap {
             pathParameterKeys?.forEach { (key, index) ->

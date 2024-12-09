@@ -4,14 +4,18 @@ import com.sun.net.httpserver.HttpServer
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import nl.mdsystems.engine.EngineMain
 import nl.mdsystems.engine.extensions.getElapsedTimeInSecondsWithDecimal
+import nl.mdsystems.engine.logging.MdsEngineLogging
 import nl.mdsystems.engine.logging.functions.error
 import nl.mdsystems.engine.logging.functions.info
+import nl.mdsystems.engine.metrics.MdsEngineMetrics
 import nl.mdsystems.engine.socket.interfaces.EngineSocketConfig
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import kotlin.coroutines.EmptyCoroutineContext
 
 class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
+    internal val metrics by MdsEngineMetrics
+    internal val logger by MdsEngineLogging
     internal val configuration: EngineSocketConfig = object : EngineSocketConfig {
         override var host: String = "0.0.0.0"
         override var port: Int = 80
@@ -40,10 +44,6 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
         )
     }
 
-    fun EngineMain.createSocketContext() {
-
-    }
-
     /**
      * Sets the executor for handling incoming requests. This executor is responsible for dispatching
      * the request handling tasks to a coroutine dispatcher.
@@ -62,14 +62,14 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
      * @see metrics.incrementTotalRequestCurrentlyProcessing
      * @see logging.error
      */
-    fun EngineMain.setRequestExecutor(dispatcherChooser: () -> ExecutorCoroutineDispatcher) {
+    fun setRequestExecutor(dispatcherChooser: () -> ExecutorCoroutineDispatcher) {
         socket.setExecutor {
             metrics.incrementTotalRequestCurrentlyProcessing()
 
             runCatching {
                 dispatcherChooser().dispatch(EmptyCoroutineContext, it)
             }.onFailure { exception ->
-                logging.error(exception)
+                logger.error(exception)
             }
         }
     }
@@ -90,11 +90,11 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
      * @see isInterrupted
      * @see socket.stop
      */
-    fun EngineMain.startServer() {
+    fun startServer() {
         socket.start()
 
-        logging.info("Listening on: ${socket.address}")
-        logging.info("Application started in: ${getElapsedTimeInSecondsWithDecimal()} seconds")
+        logger.info("Listening on: ${socket.address}")
+        logger.info("Application started in: ${getElapsedTimeInSecondsWithDecimal()} seconds")
 
         // Keep thread running until interrupted
         while (!Thread.currentThread().isInterrupted) {
@@ -117,9 +117,9 @@ class EngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
      * @see HttpServer.stop
      * @see logging.info
      */
-    fun EngineMain.stopServer() {
-        logging.info("Stopping Http socket...")
+    fun stopServer() {
+        logger.info("Stopping Http socket...")
         socket.stop(0)
-        logging.info("Http socket stopped.")
+        logger.info("Http socket stopped.")
     }
 }

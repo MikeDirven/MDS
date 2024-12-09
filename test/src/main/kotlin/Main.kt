@@ -11,6 +11,7 @@ import nl.mdsystems.engine.EngineMain
 import nl.mdsystems.engine.extensions.routing
 import nl.mdsystems.engine.logging.functions.info
 import nl.mdsystems.engine.mdsModule
+import nl.mdsystems.engine.pipelines.responders.respondFile
 import nl.mdsystems.engine.routing.dsl.get
 import nl.mdsystems.engine.routing.dsl.route
 import nl.mdsystems.engine.templating.kotlinx.html.respondHtml
@@ -35,18 +36,24 @@ fun main(): Unit = EngineMain {
 fun routing() = mdsModule("Test_Routing"){
     routing {
         route("test"){
-            get {
+            get("herman") {
                 logger.info(this.request.path)
-                respondHtml {
-                    body {
-                        h1 {
-                            +"This is a test"
-                        }
-                        p {
-                            +"The current path is: ${request.path}"
-                        }
-                    }
-                }
+                respondFile(
+                    File("C:\\Users\\Mike\\Desktop\\MDS\\index.html")
+                )
+//                respondHtml {
+//                    body {
+//                        h1 {
+//                            +"This is a test"
+//                        }
+//                        p {
+//                            +"The current path is: ${request.path}"
+//                        }
+//                        p {
+//                            +"Esmee dit is niet vanzelf sprekend :)"
+//                        }
+//                    }
+//                }
             }
         }
     }

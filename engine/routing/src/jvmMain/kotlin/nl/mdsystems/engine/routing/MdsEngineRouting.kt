@@ -14,8 +14,8 @@ class MdsEngineRouting(
 )  {
     internal val logger by MdsEngineLogging
     internal val activeRoutingContexts: ConcurrentSkipListSet<RouteBuilder>
+        = ConcurrentSkipListSet()
 
-    = ConcurrentSkipListSet()
     internal val builder: RoutingBuilder
         = object : RoutingBuilder(this, socketContext, logger) {
             override var rootPath: String = ""

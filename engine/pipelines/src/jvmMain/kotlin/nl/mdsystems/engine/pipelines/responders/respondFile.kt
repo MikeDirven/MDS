@@ -4,6 +4,7 @@ import nl.mdsystems.engine.pipelines.ResponsePipeline
 import nl.mdsystems.engine.pipelines.enums.HttpStatusCode
 import java.io.File
 import java.io.FileInputStream
+import java.util.zip.GZIPOutputStream
 
 fun ResponsePipeline.respondFile(file: File, statusCode: HttpStatusCode = HttpStatusCode.OK) {
     if (!file.exists() || !file.isFile) {
@@ -12,15 +13,17 @@ fun ResponsePipeline.respondFile(file: File, statusCode: HttpStatusCode = HttpSt
 
     val contentType = getContentType(file.extension)
     val fileBytes = file.readBytes()
-
-    connection.responseHeaders.add("Content-Type", contentType)
-    connection.sendResponseHeaders(statusCode.code, fileBytes.size.toLong())
-
-    val outputStream = connection.responseBody
-    val inputStream = FileInputStream(file)
-    inputStream.copyTo(outputStream)
-    outputStream.close()
-    inputStream.close()
+    val acceptEncoding = request.headers.get("Accept-Encoding")?.firstOrNull()?.split(',')
+    if (acceptEncoding?.contains("gzip") == true) {
+        connection.responseHeaders.add("Content-Encoding", "gzip")
+        connection.sendResponseHeaders(statusCode.code, fileBytes.size.toLong())
+        val gzipOutputStream = GZIPOutputStream(connection.responseBody)
+        gzipOutputStream.write(fileBytes)
+    } else {
+        connection.responseHeaders.add("Content-Type", contentType)
+        connection.sendResponseHeaders(statusCode.code, fileBytes.size.toLong())
+        connection.responseBody.write(fileBytes)
+    }
 }
 
 private fun getContentType(extension: String): String {

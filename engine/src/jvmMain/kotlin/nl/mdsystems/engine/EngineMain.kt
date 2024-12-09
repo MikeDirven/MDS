@@ -30,10 +30,7 @@ actual class EngineMain private constructor(
     init {
         setStartingTime()
 
-        serverSocket.run {
-            createSocketContext()
-            setRequestExecutor(threading::selectLeastBusyPool)
-        }
+        serverSocket.setRequestExecutor(threading::selectLeastBusyPool)
 
         // Startup modules loader
         modules.run {
@@ -46,17 +43,13 @@ actual class EngineMain private constructor(
 
 
     override fun run() {
-        serverSocket.apply {
-            startServer()
-        }
+        serverSocket.startServer()
 
         shutDown()
     }
 
     private fun shutDown() {
-        serverSocket.apply {
-            stopServer()
-        }
+        serverSocket.stopServer()
 
         threading.closeAllPools()
 

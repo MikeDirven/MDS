@@ -23,6 +23,7 @@ kotlin {
             dependencies {
                 implementation(project(":engine:logging"))
                 implementation(project(":engine:pipelines"))
+                implementation(project(":engine:metrics"))
                 implementation(libs.kotlin.coroutines)
             }
         }

@@ -22,7 +22,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(libs.kotlin.coroutines)
-                implementation(libs.logback.classic)
+                implementation(project(":engine:logging"))
             }
         }
     }
