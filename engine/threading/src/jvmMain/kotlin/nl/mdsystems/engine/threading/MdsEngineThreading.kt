@@ -3,13 +3,15 @@ package nl.mdsystems.engine.threading
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.newFixedThreadPoolContext
+import nl.mdsystems.engine.core.classes.Component
 import nl.mdsystems.engine.logging.MdsEngineLogging
 import nl.mdsystems.engine.logging.functions.info
 import nl.mdsystems.engine.threading.interfaces.EngineThreadPoolConfiguration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.reflect.KProperty
 
 /**
  * A class responsible for managing a set of thread pools for the MdsEngine.
@@ -102,5 +104,19 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
             threadPools[dispatcher] = AtomicInteger(0)
         }
         MdsEngineLogging.get()?.info("Thread pools initialized")
+
+        instance.set(this)
+    }
+
+    companion object {
+        val COMPONENT = Component<MdsEngineThreading>("MDS-Engine-Threading")
+
+        val instance: AtomicReference<MdsEngineThreading?> = AtomicReference<MdsEngineThreading?>(null)
+
+        fun get() = instance.get()
+
+        operator fun getValue(thisRef: Any?, property: KProperty<*>) : MdsEngineThreading {
+            return instance.get() ?: throw InstantiationException("Socket not yet initialized!")
+        }
     }
 }

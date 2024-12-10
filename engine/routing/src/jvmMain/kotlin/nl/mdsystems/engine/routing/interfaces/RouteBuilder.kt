@@ -2,6 +2,7 @@ package nl.mdsystems.engine.routing.interfaces
 
 import com.sun.net.httpserver.HttpServer
 import nl.mdsystems.engine.logging.MdsEngineLogging
+import nl.mdsystems.engine.logging.MdsEngineLogging.Companion.getValue
 import nl.mdsystems.engine.logging.functions.info
 import nl.mdsystems.engine.routing.MdsEngineRouting
 import nl.mdsystems.engine.routing.enums.RouteContextState
@@ -43,7 +44,7 @@ abstract class RouteBuilder {
                     context = httpContext
                 ).addHandler(this.method, this.handler)
             )
-            logging.info("${this.method} Route $parentPath/$path created.")
+            logging.info("${this.method} Route $path created.")
         }
     }
 }

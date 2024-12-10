@@ -1,0 +1,11 @@
+package nl.mdsystems.engine.routing.extensions
+
+import nl.mdsystems.engine.core.interfaces.MdsEngineConfig
+import nl.mdsystems.engine.routing.MdsEngineRouting
+import nl.mdsystems.engine.routing.interfaces.RoutingBuilder
+
+
+fun MdsEngineConfig.routing(configure: RoutingBuilder.() -> Unit) {
+    val instance = MdsEngineRouting(configure)
+    registerComponent(MdsEngineRouting.COMPONENT, instance)
+}

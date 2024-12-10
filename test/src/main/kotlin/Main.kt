@@ -1,26 +1,29 @@
 package nl.mdsystems
 
-import kotlinx.html.DIV
-import kotlinx.html.body
-import kotlinx.html.dom.createHTMLDocument
-import kotlinx.html.h1
-import kotlinx.html.html
-import kotlinx.html.p
-import kotlinx.html.stream.createHTML
-import nl.mdsystems.engine.EngineMain
-import nl.mdsystems.engine.extensions.routing
+import nl.mdsystems.engine.MdsEngineMain
+import nl.mdsystems.engine.logging.extensions.logging
 import nl.mdsystems.engine.logging.functions.info
-import nl.mdsystems.engine.mdsModule
+import nl.mdsystems.engine.modules.classes.mdsModule
+import nl.mdsystems.engine.modules.extensions.modules
 import nl.mdsystems.engine.pipelines.responders.respondFile
 import nl.mdsystems.engine.routing.dsl.get
 import nl.mdsystems.engine.routing.dsl.route
-import nl.mdsystems.engine.templating.kotlinx.html.respondHtml
+import nl.mdsystems.engine.routing.extensions.routing
+import nl.mdsystems.engine.socket.extensions.socket
+import nl.mdsystems.engine.threading.extensions.threading
 import java.io.File
 
-fun main(): Unit = EngineMain {
+fun main(): Unit = MdsEngineMain {
+    threading {
+
+    }
     socket {
         host = "0.0.0.0"
         port = 8008
+    }
+
+    logging {
+
     }
 
     routing {
@@ -29,11 +32,11 @@ fun main(): Unit = EngineMain {
 
     modules {
         waitForModules = true
-        + routing()
+        + routingModule()
     }
-}
+}.start()
 
-fun routing() = mdsModule("Test_Routing"){
+fun routingModule() = mdsModule("Test_Routing"){
     routing {
         route("test"){
             get("herman") {

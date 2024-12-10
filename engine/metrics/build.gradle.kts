@@ -21,6 +21,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
+                implementation(project(":engine:core"))
                 implementation(libs.kotlin.coroutines)
                 implementation(project(":engine:logging"))
             }

@@ -1,12 +1,11 @@
 package nl.mdsystems.engine.logging
 
+import nl.mdsystems.engine.core.classes.Component
 import nl.mdsystems.engine.logging.interfaces.EngineLoggingConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty0
 
 /**
  * A class that manages logging configuration for the MDS Engine.
@@ -43,6 +42,7 @@ class MdsEngineLogging(config: (EngineLoggingConfig.() -> Unit)? = null) {
     }
 
     companion object {
+        val COMPONENT = Component<MdsEngineLogging>("MDS-Engine-Logging")
         val instance: AtomicReference<MdsEngineLogging?> = AtomicReference<MdsEngineLogging?>(null)
 
         fun get() = instance.get()

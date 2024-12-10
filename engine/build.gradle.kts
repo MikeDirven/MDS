@@ -21,10 +21,13 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
+                api(project(":engine:core"))
+                api(project(":engine:socket"))
+                implementation(project(":engine:modules"))
                 api(project(":engine:threading"))
-                api(project(":engine:logging"))
-                api(project(":engine:metrics"))
-                api(project(":engine:routing"))
+                implementation(project(":engine:logging"))
+                implementation(project(":engine:metrics"))
+                implementation(project(":engine:routing"))
                 api(project(":engine:pipelines"))
                 implementation(project(":utils"))
                 

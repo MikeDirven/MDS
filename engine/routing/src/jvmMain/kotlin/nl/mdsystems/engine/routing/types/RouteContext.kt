@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpContext
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import nl.mdsystems.engine.metrics.MdsEngineMetrics
+import nl.mdsystems.engine.metrics.MdsEngineMetrics.Companion.getValue
 import nl.mdsystems.engine.pipelines.ResponsePipeline
 import nl.mdsystems.engine.pipelines.enums.HttpMethod
 import nl.mdsystems.engine.routing.enums.RouteContextState
@@ -40,7 +41,7 @@ class RouteContext(
                 }
             }
 
-            metrics.updateRequestProcessingTimes(
+            metrics?.updateRequestProcessingTimes(
                 System.currentTimeMillis() - startProcessingTime
             )
 

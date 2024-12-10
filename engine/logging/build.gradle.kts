@@ -23,6 +23,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.coroutines)
                 implementation(libs.logback.classic)
+
+                implementation(project(":engine:core"))
             }
         }
     }

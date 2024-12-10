@@ -1,15 +1,17 @@
 package nl.mdsystems.engine.metrics
 
+import nl.mdsystems.engine.core.classes.Component
 import nl.mdsystems.engine.logging.MdsEngineLogging
+import nl.mdsystems.engine.logging.MdsEngineLogging.Companion.getValue
 import nl.mdsystems.engine.logging.functions.info
-import nl.mdsystems.engine.metrics.interfaces.EngineMetrics
+import nl.mdsystems.engine.metrics.interfaces.EngineMetricsConfig
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KProperty
 
 class MdsEngineMetrics {
     internal val logger by MdsEngineLogging
-    internal object metrics : EngineMetrics {
+    internal object metrics : EngineMetricsConfig {
         override val totalRequestHandled: AtomicLong = AtomicLong(0L)
         override val totalRequestCurrentlyProcessing: AtomicLong = AtomicLong(0L)
 
@@ -23,7 +25,7 @@ class MdsEngineMetrics {
         instance.set(this)
     }
 
-    fun get() = object : EngineMetrics by metrics {}
+    fun get() = object : EngineMetricsConfig by metrics {}
 
     fun incrementTotalRequestHandled() {
         metrics.totalRequestHandled.incrementAndGet()
@@ -72,12 +74,13 @@ class MdsEngineMetrics {
     }
 
     companion object {
+        val COMPONENT = Component<MdsEngineMetrics>("MDS-Engine-Metrics")
         val instance: AtomicReference<MdsEngineMetrics?> = AtomicReference<MdsEngineMetrics?>(null)
 
         fun get() = instance.get()
 
-        operator fun getValue(thisRef: Any?, property: KProperty<*>) : MdsEngineMetrics {
-            return instance.get() ?: throw InstantiationException("Metrics not yet initialized!")
+        operator fun getValue(thisRef: Any?, property: KProperty<*>) : MdsEngineMetrics? {
+            return instance.get()
         }
     }
 }
