@@ -6,6 +6,10 @@ import nl.mdsystems.engine.routing.interfaces.RoutingBuilder
 
 
 fun MdsEngineConfig.routing(configure: RoutingBuilder.() -> Unit) {
-    val instance = MdsEngineRouting(configure)
-    registerComponent(MdsEngineRouting.COMPONENT, instance)
+    getComponentOrNull(MdsEngineRouting.COMPONENT)?.apply {
+        configure(getBuilder())
+    } ?: registerComponent(
+            MdsEngineRouting.COMPONENT,
+            MdsEngineRouting(configure)
+        )
 }

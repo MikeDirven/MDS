@@ -137,7 +137,7 @@ class MdsEngineHttpSocket(config: (EngineSocketConfig.() -> Unit)? = null) {
         fun get() = instance.get()
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>) : MdsEngineHttpSocket {
-            return instance.get() ?: throw InstantiationException("Socket not yet initialized!")
+            return instance.get() ?: MdsEngineHttpSocket().also { instance.set(it) }
         }
     }
 }

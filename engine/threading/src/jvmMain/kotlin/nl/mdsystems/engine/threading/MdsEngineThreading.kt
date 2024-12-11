@@ -30,7 +30,7 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
     private val configuration = object : EngineThreadPoolConfiguration {
         override var maxPoolThreads: Int = 4
         override var maxPools: Int = 10
-        override var poolName: String = "MdsEngineThreadPool"
+        override var poolName: String = "Mds_Pipeline_pool"
     }
 
     private val threadPools = ConcurrentHashMap<ExecutorCoroutineDispatcher, AtomicInteger>()
@@ -97,7 +97,7 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
         for (poolNumber in 0 until configuration.maxPools) {
             val dispatcher = newFixedThreadPoolContext(
                 configuration.maxPoolThreads,
-                configuration.poolName + "-$poolNumber"
+                configuration.poolName + "-${poolNumber}_worker"
             )
 
             // Initialize workload as 0
@@ -116,7 +116,7 @@ class MdsEngineThreading(config: (EngineThreadPoolConfiguration.() -> Unit)? = n
         fun get() = instance.get()
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>) : MdsEngineThreading {
-            return instance.get() ?: throw InstantiationException("Socket not yet initialized!")
+            return instance.get() ?: MdsEngineThreading().also { instance.set(it) }
         }
     }
 }

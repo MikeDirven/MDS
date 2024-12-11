@@ -3,12 +3,15 @@ package nl.mdsystems.engine
 import nl.mdsystems.engine.core.MdsEngine
 import nl.mdsystems.engine.core.interfaces.MdsEngineConfig
 import nl.mdsystems.engine.logging.MdsEngineLogging
+import nl.mdsystems.engine.logging.MdsEngineLogging.Companion.getValue
 import nl.mdsystems.engine.logging.functions.info
 import nl.mdsystems.engine.metrics.MdsEngineMetrics
 import nl.mdsystems.engine.modules.MdsEngineModules
 import nl.mdsystems.engine.routing.MdsEngineRouting
 import nl.mdsystems.engine.socket.MdsEngineHttpSocket
+import nl.mdsystems.engine.socket.MdsEngineHttpSocket.Companion.getValue
 import nl.mdsystems.engine.threading.MdsEngineThreading
+import nl.mdsystems.engine.threading.MdsEngineThreading.Companion.getValue
 import nl.mdsystems.utils.setStartingTime
 import kotlin.system.exitProcess
 
@@ -16,21 +19,14 @@ import kotlin.system.exitProcess
 class MdsEngineMain(
     config: MdsEngineConfig.() -> Unit
 ) : MdsEngine(config) {
-    internal lateinit var logging: MdsEngineLogging
-    internal lateinit var threading: MdsEngineThreading
-    internal lateinit var serverSocket: MdsEngineHttpSocket
-    internal lateinit var routing: MdsEngineRouting
-    internal var modules: MdsEngineModules? = null
-    internal var metrics: MdsEngineMetrics? = null
+    internal val logging: MdsEngineLogging by MdsEngineLogging
+    internal val threading: MdsEngineThreading by MdsEngineThreading
+    internal val serverSocket: MdsEngineHttpSocket by MdsEngineHttpSocket
+    internal val routing: MdsEngineRouting = engineConfig.getComponent(MdsEngineRouting.COMPONENT)
+    internal val modules: MdsEngineModules? = engineConfig.getComponentOrNull(MdsEngineModules.COMPONENT)
+    internal val metrics: MdsEngineMetrics? = engineConfig.getComponentOrNull(MdsEngineMetrics.COMPONENT)
 
     override fun start() {
-        logging = engineConfig.getComponent(MdsEngineLogging.COMPONENT)
-        metrics = engineConfig.getComponentOrNull(MdsEngineMetrics.COMPONENT)
-        threading = engineConfig.getComponent(MdsEngineThreading.COMPONENT)
-        serverSocket = engineConfig.getComponent(MdsEngineHttpSocket.COMPONENT)
-        routing = engineConfig.getComponent(MdsEngineRouting.COMPONENT)
-        modules = engineConfig.getComponentOrNull(MdsEngineModules.COMPONENT)
-
         setStartingTime()
 
         serverSocket.setRequestExecutor(threading::selectLeastBusyPool)

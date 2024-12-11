@@ -48,7 +48,7 @@ class MdsEngineLogging(config: (EngineLoggingConfig.() -> Unit)? = null) {
         fun get() = instance.get()
 
         operator fun getValue(thisRef: Any?, property: KProperty<*>) : MdsEngineLogging {
-            return instance.get() ?: throw InstantiationException("Logging not yet initialized!")
+            return instance.get() ?: MdsEngineLogging().also { instance.set(it) }
         }
     }
 }
